@@ -18,26 +18,27 @@ class TokenRequest(BaseModel):
 
 @app.post("/api/channel/token")
 def create_token(request: TokenRequest):
-    channel_name = request.channelName.strip()
+    try:
+        channel_name = request.channelName.strip()
 
-    if not channel_name:
-        raise HTTPException(status_code=400, detail="Channel name is required")
+        if not channel_name:
+            raise HTTPException(status_code=400, detail="Channel name is required")
 
-    current_ts = int(time.time())
-    privilege_expired_ts = current_ts + TOKEN_EXPIRE_SECONDS
+        current_ts = int(time.time())
+        privilege_expired_ts = current_ts + TOKEN_EXPIRE_SECONDS
 
-    # UID = 0 → Agora يخصص تلقائيًا
-    token = RtcTokenBuilder.build_token_with_uid(
-        APP_ID,
-        APP_CERTIFICATE,
-        channel_name,
-        0,
-        RtcTokenBuilder.Role_Publisher,
-        privilege_expired_ts
-    )
+        token = RtcTokenBuilder.build_token_with_uid(
+            APP_ID, APP_CERTIFICATE, channel_name, 0,
+            RtcTokenBuilder.Role_Publisher, privilege_expired_ts
+        )
 
-    return {
-        "channelName": channel_name,
-        "token": token,
-        "expireInSeconds": TOKEN_EXPIRE_SECONDS
-    }
+        return {
+            "channelName": channel_name,
+            "token": token,
+            "expireInSeconds": TOKEN_EXPIRE_SECONDS
+        }
+
+    except Exception as e:
+        print(f"❌ Error creating token: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
