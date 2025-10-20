@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from agora_token_builder import RtcTokenBuilder
 import time
 import os
+
+# ✳️ لاحظ هنا — الاستيراد من الكلاس الثاني
+from agora_token_builder import RtcTokenBuilder2
 
 app = FastAPI(title="Agora Token Generator")
 
@@ -26,13 +28,13 @@ def create_token(request: TokenRequest):
     privilege_expired_ts = current_ts + TOKEN_EXPIRE_SECONDS
 
     try:
-        # ✅ استخدم build_token_with_uid_v2 بدلاً من build_token_with_uid
-        token = RtcTokenBuilder.build_token_with_uid_v2(
+        # ✅ استخدام الكلاس الصحيح RtcTokenBuilder2
+        token = RtcTokenBuilder2.build_token_with_uid(
             APP_ID,
             APP_CERTIFICATE,
             channel_name,
             0,  # UID
-            RtcTokenBuilder.Role_PUBLISHER,
+            RtcTokenBuilder2.Role_PUBLISHER,
             privilege_expired_ts,
         )
 
